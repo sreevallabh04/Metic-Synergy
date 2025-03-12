@@ -49,8 +49,14 @@ const VideoPage: React.FC = () => {
           </p>
         </div>
         
-        {/* CTA Button */}
-        <div className="text-center">
+        {/* Step 2 Content */}
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">STEP 2: LIKE WHAT YOU HEAR? LET'S TALK...</h2>
+          <p className="text-gray-300 mb-6">
+            Have questions? Interested in working together? Click the button below to schedule a call...
+          </p>
+          
+          {/* CTA Button */}
           <button 
             onClick={handleBookAppointment}
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-8 rounded-xl 
@@ -58,7 +64,7 @@ const VideoPage: React.FC = () => {
                      shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40
                      transform hover:scale-105 font-medium text-lg"
           >
-            Book an appointment
+            Schedule a call
           </button>
         </div>
       </div>

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { FlickeringGrid } from '../components/FlickeringGrid';
 import { Calendar, Clock, Mail, Phone, User, Building } from 'lucide-react';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
+import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { useBooking } from '../contexts/BookingContext';
 
@@ -15,6 +19,7 @@ const Book: React.FC = () => {
     company: '',
     service: ''
   });
+  const [dateTime, setDateTime] = useState<dayjs.Dayjs | null>(dayjs());
   const [error, setError] = useState<string | null>(null);
 
   const validateEmail = (email: string) => {
@@ -29,6 +34,18 @@ const Book: React.FC = () => {
       setError('Please enter a valid email address');
       return;
     }
+    
+    if (!dateTime) {
+      setError('Please select a date and time');
+      return;
+    }
+    
+    // Format date and time from the dateTime state
+    const formattedData = {
+      ...formData,
+      date: dateTime.format('YYYY-MM-DD'),
+      time: dateTime.format('HH:mm')
+    };
   
     try {
       const response = await fetch('http://localhost:5000/api/bookings', {
@@ -36,7 +53,7 @@ const Book: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formattedData),
       });
   
       if (!response.ok) {
@@ -64,7 +81,7 @@ const Book: React.FC = () => {
         transformStyle: 'preserve-3d',
         boxShadow: '0px 10px 50px rgba(0, 0, 0, 0.8)', // Stronger shadow for depth
       }}>
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-8">Book an Appointment</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-8">Schedule a Call</h1>
         
         <StyledWrapper>
           <div className="form-container">
@@ -148,39 +165,55 @@ const Book: React.FC = () => {
                 </select>
               </div>
               
-              <div className="date-time-container">
-                <div className="form-group date-group">
-                  <label htmlFor="date">
-                    <Calendar className="icon" /> Date
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group time-group">
-                  <label htmlFor="time">
-                    <Clock className="icon" /> Time
-                  </label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    value={formData.time}
-                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                    required
-                  />
+              <div className="date-time-picker-container">
+                <label className="date-time-label">
+                  <Calendar className="icon" /> Select Date and Time
+                </label>
+                <div className="date-time-picker-wrapper">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <StaticDateTimePicker
+                      orientation="landscape"
+                      value={dateTime}
+                      onChange={(newValue) => setDateTime(newValue)}
+                      slotProps={{
+                        actionBar: { actions: [] },
+                        toolbar: { hidden: false },
+                      }}
+                      sx={{
+                        backgroundColor: "#212121",
+                        color: "white",
+                        borderRadius: "8px",
+                        border: "1px solid #414141",
+                        "& .MuiPickersDay-root": {
+                          color: "white",
+                        },
+                        "& .MuiPickersDay-today": {
+                          border: "1px solid #e81cff",
+                        },
+                        "& .MuiPickersDay-root.Mui-selected": {
+                          backgroundColor: "#e81cff",
+                        },
+                        "& .MuiTypography-root": {
+                          color: "white",
+                        },
+                        "& .MuiClock-pin": {
+                          backgroundColor: "#e81cff",
+                        },
+                        "& .MuiClockPointer-root": {
+                          backgroundColor: "#e81cff",
+                        },
+                        "& .MuiClockPointer-thumb": {
+                          backgroundColor: "#e81cff",
+                          borderColor: "#e81cff",
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
                 </div>
               </div>
               
               <button className="form-submit-btn" type="submit">
-                Schedule Appointment
+                Schedule a call
               </button>
             </form>
           </div>
@@ -225,14 +258,32 @@ const StyledWrapper = styled.div`
     gap: 2px;
   }
 
-  .date-time-container {
+  .date-time-picker-container {
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    gap: 8px;
     width: 100%;
   }
 
-  .date-group, .time-group {
-    flex: 1;
+  .date-time-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    color: #717171;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .date-time-label .icon {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+  }
+
+  .date-time-picker-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
   }
 
   .form-container .form-group label {

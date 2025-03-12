@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FlickeringGrid } from '../components/FlickeringGrid';
+import { BoxReveal } from '../registry/magicui/box-reveal';
 
 interface Question {
   id: number;
@@ -98,9 +99,13 @@ const Survey: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-black/90 z-1"></div>
       
       <div className="z-10 max-w-4xl mx-auto w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-          Digital Marketing Survey
-        </h1>
+        <div className="mb-10 mt-4">
+          <BoxReveal boxColor="#5046e6" duration={0.6}>
+            <h1 className="text-4xl md:text-6xl font-bold text-center mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500 py-2">
+              Digital Marketing Survey
+            </h1>
+          </BoxReveal>
+        </div>
         
         {userFormData && (
           <div className="text-center mb-8">
