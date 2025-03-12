@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { createBooking } from '../services/api';
 
 interface BookingContextType {
   isModalOpen: boolean;
@@ -18,6 +19,7 @@ export interface BookingFormData {
   date: string;
   time: string;
   service: string;
+  company: string;
 }
 
 const services = [
@@ -44,7 +46,8 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const handleBookingSubmit = async (formData: BookingFormData) => {
     try {
       console.log('Booking submitted:', formData);
-      // Here you would typically make an API call to your backend
+      // Send the booking data to the backend API
+      await createBooking(formData);
       alert('Booking submitted successfully!');
       closeModal();
     } catch (error) {

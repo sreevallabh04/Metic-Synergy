@@ -1,129 +1,148 @@
-# 🚀 Metic Synergy - Digital Excellence Redefined
+# Metic Synergy - Deployment Guide
 
-<div align="center">
-  
-![Metic Synergy](public/logo.png)
+This guide provides instructions for deploying both the frontend and backend components of the Metic Synergy application to production environments.
 
-[![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-Styled-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Framer-Motion-0055FF?style=flat-square&logo=framer)](https://www.framer.com/motion/)
+## Project Structure
 
-</div>
+The project consists of two main components:
 
-## ✨ Overview
+- **Frontend**: React/TypeScript application built with Vite
+- **Backend**: Express.js API with MongoDB integration
 
-Metic Synergy is a cutting-edge digital agency platform built with modern web technologies. Our platform showcases our expertise in digital transformation, creative design, and technical innovation through an immersive and interactive user experience.
+## Prerequisites
 
-## 🎯 Key Features
+- Node.js (v16+)
+- MongoDB account/instance
+- Hosting environment for frontend and backend (e.g., Vercel, Netlify, Heroku, AWS, etc.)
 
-- **🎨 Modern Design System**
-  - Sleek, minimalist interface with dynamic animations
-  - Responsive layout for all devices
-  - Custom gradient effects and glass-morphism
-  - Interactive hover states and transitions
+## Environment Configuration
 
-- **⚡ Performance Optimized**
-  - Next.js for optimal rendering
-  - Efficient component architecture
-  - Lazy loading and code splitting
-  - Optimized assets and images
+### Frontend Configuration
 
-- **🛠️ Technical Stack**
-  - React with TypeScript
-  - Tailwind CSS for styling
-  - Framer Motion for animations
-  - Lucide icons for consistent iconography
+1. Create a production environment file:
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
 ```bash
-git clone https://github.com/your-username/metic-synergy.git
+cd frontend
+cp .env.example .env.production
 ```
 
-2. Install dependencies
+2. Edit `.env.production` with your production values:
+
+```
+VITE_API_URL=https://your-production-api-url.com
+VITE_BASE_URL=/  # Use '/' for root path or '/app-name' if deployed to a subfolder
+```
+
+### Backend Configuration
+
+1. Create a production environment file:
+
 ```bash
-cd metic-synergy
+cd backend
+cp .env.example .env
+```
+
+2. Edit `.env` with your production values:
+
+```
+PORT=5000  # Or any port your host supports
+MONGODB_URI=your-production-mongodb-connection-string
+CORS_ORIGINS=https://your-production-frontend-url.com
+```
+
+## Building for Production
+
+### Frontend Build
+
+```bash
+cd frontend
 npm install
-# or
-yarn install
+npm run build
 ```
 
-3. Start the development server
+This creates a `dist` directory with optimized production assets.
+
+### Backend Preparation
+
 ```bash
-npm run dev
-# or
-yarn dev
+cd backend
+npm install
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+## Deployment Options
 
-## 🎨 Features & Pages
+### Frontend Deployment
 
-### 🏠 Home Page
-- Dynamic hero section with parallax effects
-- Animated service cards
-- Client testimonials with carousel
-- Interactive project showcase
+#### Option 1: Vercel/Netlify
 
-### 📞 Contact Page
-- Team member profiles with hover effects
-- Interactive contact cards
-- Integrated booking system
-- Location information with map
+1. Connect your GitHub repository
+2. Set the build command to: `cd frontend && npm install && npm run build`
+3. Set the publish directory to: `frontend/dist`
+4. Configure environment variables in the hosting platform's dashboard
 
-### 📅 Booking System
-- User-friendly appointment scheduling
-- Service selection interface
-- Time slot picker
-- Confirmation system
+#### Option 2: Traditional Hosting
 
-## 🛠️ Built With
+1. Upload the contents of `frontend/dist` to your web server
+2. Configure your web server to serve the application correctly:
+   - Serve `index.html` for all routes (for SPA routing)
+   - Set appropriate cache headers for static assets
 
-- [React](https://reactjs.org/) - Frontend framework
-- [TypeScript](https://www.typescriptlang.org/) - Type safety
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Framer Motion](https://www.framer.com/motion/) - Animations
-- [Lucide Icons](https://lucide.dev/) - Icon system
+### Backend Deployment
 
-## 📱 Responsive Design
+#### Option 1: Heroku
 
-The platform is fully responsive and optimized for:
-- 📱 Mobile devices
-- 💻 Tablets
-- 🖥️ Desktop screens
-- 📺 Large displays
+1. Create a `Procfile` in the `backend` directory:
+   ```
+   web: node index.js
+   ```
+2. Deploy using the Heroku CLI or GitHub integration
+3. Set environment variables in Heroku dashboard
 
-## 🤝 Contributing
+#### Option 2: Digital Ocean/AWS/Other VPS
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Set up a Node.js environment
+2. Use PM2 or similar process manager:
+   ```bash
+   npm install -g pm2
+   cd backend
+   pm2 start index.js --name "metic-api"
+   ```
+3. Configure Nginx as a reverse proxy (recommended)
 
-## 📄 License
+## Post-Deployment Verification
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+1. Visit your frontend URL and ensure the UI loads correctly
+2. Test the booking functionality to verify backend communication
+3. Check server logs for any errors or issues
 
-## 📞 Contact
+## Continuous Deployment
 
-Metic Synergy - [contact@meticsynergy.com](mailto:contact@meticsynergy.com)
+For automated deployments:
 
-Project Link: [https://github.com/your-username/metic-synergy](https://github.com/your-username/metic-synergy)
+1. Set up CI/CD pipelines (GitHub Actions, GitLab CI, etc.)
+2. Configure build and deployment steps
+3. Include environment variable handling
+4. Add automated tests to verify deployments
+
+## Troubleshooting
+
+### Common Issues
+
+1. **CORS Errors**: Ensure `CORS_ORIGINS` in backend includes the exact frontend URL
+2. **API Connection Failures**: Verify `VITE_API_URL` is correct and backend is running
+3. **MongoDB Connection Issues**: Check network access rules for your MongoDB instance
+
+### Logs
+
+- Frontend: Check browser console for client-side errors
+- Backend: Check server logs via your hosting platform or PM2 logs
+
+## Maintenance
+
+1. Regularly update dependencies for security
+2. Monitor server resources and scale as needed
+3. Back up MongoDB data regularly
 
 ---
 
-<div align="center">
-  
-Made with ❤️ by Metic Synergy
-
-</div> 
+For additional support or questions, please contact the development team.
