@@ -45,15 +45,16 @@ const Hero: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className={`transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-              <HyperText 
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-white font-serif"
-                duration={30}
-                delay={50}
-                startOnView={true}
-                animateOnHover={false}
-              >
-                METIC-SYNERGY
-              </HyperText>
+            <HyperText 
+  className="text-4xl md:text-5xl lg:text-6xl font-bold text-white font-serif"
+  duration={3000} // 3 seconds
+  delay={0} // No delay for immediate start
+  startOnView={true}
+  animateOnHover={true}
+>
+  METIC-SYNERGY
+</HyperText>
+
             </h1>
           </div>
           
@@ -100,8 +101,13 @@ const Hero: React.FC = () => {
           <div className={`flex justify-center items-center transition-opacity duration-500 ${
             isVisible ? "opacity-100" : "opacity-0"
           }`}>
-            <div className="w-full md:w-auto">
-              <HomeForm />
+            <div className="max-w-2xl text-center">
+              <Button 
+                onClick={() => navigate('/lead-form')}
+                color="green"
+              >
+                How To Get 10, 15, 30 or More Predictable Sales Appointments Each Month
+              </Button>
             </div>
           </div>
         </div>

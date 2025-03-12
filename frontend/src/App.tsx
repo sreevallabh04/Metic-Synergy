@@ -17,6 +17,7 @@ import SocialMedia from './pages/services/SocialMedia';
 import ContentCreation from './pages/services/ContentCreation';
 import Survey from './pages/Survey';
 import VideoPage from './pages/VideoPage';
+import LeadForm from './pages/LeadForm';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/services/content-creation" element={<ContentCreation />} />
               <Route path="/survey" element={<Survey />} />
               <Route path="/video" element={<VideoPage />} />
+              <Route path="/lead-form" element={<LeadForm />} />
             </Routes>
           </main>
           <Footer />
