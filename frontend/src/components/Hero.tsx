@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Instagram, Mail, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { HyperText } from '../registry/magicui/hyper-text';
 import { TextAnimate } from '../registry/magicui/text-animate';
 import { BoxReveal } from '../registry/magicui/box-reveal';
-import Button from './Button';
-import { Vortex } from '../ui/vortex';
-import HomeForm from './HomeForm';
+import { FlipText } from '../registry/magicui/flip-text';
 
 const Hero: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -38,80 +34,58 @@ const Hero: React.FC = () => {
 
   return (
     <section className="relative min-h-screen overflow-hidden">
-      <Vortex
-        backgroundColor="black"
-        className="w-full h-full min-h-screen flex items-center justify-center text-white pt-16 pb-8"
+      <div 
+        className="w-full h-full min-h-screen flex flex-col justify-center text-white pt-16 pb-8"
+        style={{
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
       >
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h1 className={`transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-            <HyperText 
-  className="text-4xl md:text-5xl lg:text-6xl font-bold text-white font-serif"
-  duration={3000} // 3 seconds
-  delay={0} // No delay for immediate start
-  startOnView={true}
-  animateOnHover={true}
->
-  METIC-SYNERGY
-</HyperText>
-
-            </h1>
-          </div>
-          
-          <div className={`max-w-2xl mx-auto mb-10 px-2 text-center transition-opacity duration-500 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}>
-            <TextAnimate 
-  animation="blurInUp" 
-  by="line" 
-  once
-  duration={30}
-  className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-200"
->
-  CRAFTING IMPACTFUL STORIES THROUGH DIGITAL MARKETING, PHOTOGRAPHY, AND CREATIVE AD SOLUTIONS.
-</TextAnimate>
-
-          </div>
-
-          <div className={`flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 text-sm sm:text-base transition-opacity duration-500 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}>
-            <a
-              href="https://instagram.com/meticsynergy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center text-gray-300 hover:text-white transition-colors duration-300"
-            >
-              <Instagram className="mr-2 h-5 w-5" />
-              <span>meticsynergy-insta</span>
-            </a>
-            <a
-              href="mailto:meticsynergy@gmail.com"
-              className="flex items-center text-gray-300 hover:text-white transition-colors duration-300"
-            >
-              <Mail className="mr-2 h-5 w-5" />
-              <span>meticsynergy@gmail.com</span>
-            </a>
-            <div className="flex items-center text-gray-300">
-              <MapPin className="mr-2 h-5 w-5" />
-              <span>Hyderabad, India</span>
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="container">
+            {/* Heading */}
+            <div className="ml-6 md:ml-8 lg:ml-10 mb-12 text-left">
+              <h1 className={`transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+                <FlipText className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold -tracking-wider text-white">
+                  METIC-SYNERGY
+                </FlipText>
+              </h1>
             </div>
-          </div>
-
-          <div className={`flex justify-center items-center transition-opacity duration-500 ${
-            isVisible ? "opacity-100" : "opacity-0"
-          }`}>
-            <div className="max-w-2xl text-center">
-              <Button 
-                onClick={() => navigate('/lead-form')}
-                color="green"
+            
+            {/* Tagline */}
+            <div className={`ml-6 md:ml-8 lg:ml-10 mb-16 transition-opacity duration-700 ${
+              isVisible ? "opacity-100" : "opacity-0"
+            }`}>
+              <TextAnimate 
+                animation="blurInUp" 
+                by="word" 
+                once
+                duration={20}
+                className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-200 font-light tracking-wider"
               >
-                How To Get 10, 15, 30 or More Predictable Sales Appointments Each Month
-              </Button>
+                CRAFTING IMPACTFUL STORIES THROUGH
+                DIGITAL MARKETING & CREATIVE SOLUTIONS
+              </TextAnimate>
+            </div>
+
+            {/* Button */}
+            <div className={`ml-6 md:ml-8 lg:ml-10 transition-opacity duration-700 ${
+              isVisible ? "opacity-100" : "opacity-0"
+            }`}>
+              <button 
+                onClick={() => navigate('/lead-form')}
+                className="py-4 px-12 text-lg font-medium rounded-none border-2 border-white 
+                  bg-transparent hover:bg-white hover:text-black
+                  text-white transition-all duration-500 transform hover:scale-105 hover:shadow-glow"
+              >
+                Get Started
+              </button>
             </div>
           </div>
         </div>
-      </Vortex>
+      </div>
     </section>
   );
 };
