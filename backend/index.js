@@ -3,19 +3,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { sendThankYouEmail } = require('./services/emailService');
+const { sendThankYouEmail, initiateSurveyEmailSequence } = require('./services/emailService');
 const Booking = require('./models/Booking');
 const SurveyResponse = require('./models/SurveyResponse');
 const Admin = require('./models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const surveyQuestions = require('./constants/surveyQuestions');
+const initEmailScheduler = require('./services/emailScheduler');
+initEmailScheduler();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 const FRONTEND_URL = process.env.FRONTEND_URL || '*';
 
-
+// Middleware
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || FRONTEND_URL === '*' || FRONTEND_URL.split(',').includes(origin)) {
@@ -29,21 +32,22 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-
+// MongoDB Connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000
 })
-.then(() => console.log('MongoDB connected successfully'))
+.then(() => {
+  console.log('MongoDB connected successfully');
+})
 .catch(err => console.error('MongoDB connection error:', err));
 
-
+// Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
@@ -52,7 +56,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-
+// Updated Survey Response Endpoint with Email Sequence
 app.post('/api/survey-responses', async (req, res) => {
   try {
     const { name, email, answers } = req.body;
@@ -71,9 +75,22 @@ app.post('/api/survey-responses', async (req, res) => {
 
     await newResponse.save();
     
+    // Initiate the email sequence with original schedule (days 1,2,3,4,6,8,10,11)
+    await initiateSurveyEmailSequence(email, name);
+    
     res.status(201).json({ 
-      message: 'Survey response saved successfully',
-      responseId: newResponse._id
+      message: 'Survey response saved successfully. Email sequence started.',
+      responseId: newResponse._id,
+      emailSchedule: [
+        { day: 1, scheduled: '24 hours from now' },
+        { day: 2, scheduled: '48 hours from now' },
+        { day: 3, scheduled: '72 hours from now' },
+        { day: 4, scheduled: '96 hours from now' },
+        { day: 6, scheduled: '144 hours from now' },
+        { day: 8, scheduled: '192 hours from now' },
+        { day: 10, scheduled: '240 hours from now' },
+        { day: 11, scheduled: '264 hours from now' }
+      ]
     });
   } catch (err) {
     console.error('Survey response error:', err);
@@ -84,7 +101,7 @@ app.post('/api/survey-responses', async (req, res) => {
   }
 });
 
-
+// Original Booking Endpoint (unchanged)
 app.post('/api/bookings', async (req, res) => {
   try {
     const { name, phone, email, date, time, company, service } = req.body;
@@ -131,60 +148,31 @@ app.post('/api/bookings', async (req, res) => {
   }
 });
 
-
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ 
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully');
-  server.close(() => {
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed');
-      process.exit(0);
-    });
-  });
-});
-
-
+// Admin Endpoints (unchanged)
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
     
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
 
-  
     const admin = await Admin.findOne({ username });
     if (!admin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-   
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-   
     const token = jwt.sign(
       { id: admin._id }, 
       process.env.JWT_SECRET || 'your_fallback_secret_key',
       { expiresIn: '1h' }
     );
 
-    
     res.json({ 
       token,
       admin: {
@@ -192,13 +180,11 @@ app.post('/api/admin/login', async (req, res) => {
         username: admin.username
       }
     });
-
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error during authentication' });
   }
 });
-
 
 app.get('/api/admin/survey-stats', async (req, res) => {
   try {
@@ -239,7 +225,6 @@ app.get('/api/admin/survey-responses/:questionId/:option', async (req, res) => {
   }
 });
 
-
 app.get('/api/admin/appointments', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -270,6 +255,33 @@ app.get('/api/admin/appointments', async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// Server Startup
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  // Initialize email scheduler after server starts
+  initEmailScheduler();
+});
+
+// Graceful Shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  server.close(() => {
+    mongoose.connection.close(false, () => {
+      console.log('MongoDB connection closed');
+      process.exit(0);
+    });
+  });
 });
 
 module.exports = app;
